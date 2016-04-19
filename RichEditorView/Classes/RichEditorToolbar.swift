@@ -44,14 +44,14 @@ public class RichBarButtonItem: UIBarButtonItem {
     public convenience init(image: UIImage? = nil, handler: (Void -> Void)? = nil) {
         self.init(image: image, style: .Plain, target: nil, action: nil)
         target = self
-        action = Selector("buttonWasTapped")
+        action = #selector(RichBarButtonItem.buttonWasTapped)
         actionHandler = handler
     }
     
     public convenience init(title: String = "", handler: (Void -> Void)? = nil) {
         self.init(title: title, style: .Plain, target: nil, action: nil)
         target = self
-        action = Selector("buttonWasTapped")
+        action = #selector(RichBarButtonItem.buttonWasTapped)
         actionHandler = handler
     }
     
@@ -87,6 +87,10 @@ public class RichEditorToolbar: UIView {
     private var toolbarScroll: UIScrollView
     private var toolbar: UIToolbar
     private var backgroundToolbar: UIToolbar
+
+    
+
+
     
     public override init(frame: CGRect) {
         toolbarScroll = UIScrollView()
@@ -103,6 +107,8 @@ public class RichEditorToolbar: UIView {
         super.init(coder: aDecoder)
         setup()
     }
+    
+
     
     private func setup() {
         self.autoresizingMask = .FlexibleWidth
@@ -159,6 +165,12 @@ public class RichEditorToolbar: UIView {
         }
         toolbar.frame.size.height = 44
         toolbarScroll.contentSize.width = width
+    }
+    
+    
+    public func setCustomTintColor(color:UIColor) {
+        
+        toolbar.tintColor = color
     }
     
 }
