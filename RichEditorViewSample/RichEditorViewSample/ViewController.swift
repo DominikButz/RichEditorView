@@ -16,7 +16,8 @@ class ViewController: UIViewController {
 
     lazy var toolbar: RichEditorToolbar = {
         let toolbar = RichEditorToolbar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 44))
-        toolbar.options = RichEditorOptions.all()
+        toolbar.options = [RichEditorOptions.Undo, RichEditorOptions.Redo, RichEditorOptions.Bold, RichEditorOptions.Italic, RichEditorOptions.Underline, RichEditorOptions.AlignLeft, RichEditorOptions.AlignCenter, RichEditorOptions.AlignRight,
+                           RichEditorOptions.OrderedList, RichEditorOptions.UnorderedList, RichEditorOptions.Image]
         toolbar.setCustomTintColor(UIColor.greenColor())
         
         return toolbar

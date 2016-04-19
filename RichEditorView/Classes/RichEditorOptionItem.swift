@@ -102,6 +102,7 @@ public enum RichEditorOptions: RichEditorOption {
     case Image
     case Link
     
+    
     public static func all() -> [RichEditorOption] {
         return [
             Clear,
@@ -114,6 +115,7 @@ public enum RichEditorOptions: RichEditorOption {
         ]
     }
     
+ 
     // MARK: RichEditorOption
     
     public func image() -> UIImage? {
