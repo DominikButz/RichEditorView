@@ -49,15 +49,17 @@ public struct RichEditorOptionItem: RichEditorOption {
     */
     public var itemTitle: String
 
+
     /**
         The action to be performed when tapped
     */
     public var itemAction: (RichEditorToolbar? -> Void)
 
-    public init(image: UIImage?, title: String, action: (RichEditorToolbar? -> Void)) {
+    public init(image: UIImage?, title: String, action: ((RichEditorToolbar?) -> Void)) {
         itemImage = image
         itemTitle = title
         itemAction = action
+  
     }
     
     // MARK: RichEditorOption
@@ -71,6 +73,7 @@ public struct RichEditorOptionItem: RichEditorOption {
     }
     
     public func action(toolbar: RichEditorToolbar?) {
+
         itemAction(toolbar)
     }
 }

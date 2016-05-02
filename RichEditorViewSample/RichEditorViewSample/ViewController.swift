@@ -8,23 +8,41 @@
 
 import UIKit
 import RichEditorView
+import Popover
+
 
 class ViewController: UIViewController {
 
     @IBOutlet var editorView: RichEditorView!
     @IBOutlet var htmlTextView: UITextView!
+    
+    var touchPoint:CGPoint?
 
+    
     lazy var toolbar: RichEditorToolbar = {
         let toolbar = RichEditorToolbar(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 44))
-        toolbar.options = [RichEditorOptions.Undo, RichEditorOptions.Redo, RichEditorOptions.Bold, RichEditorOptions.Italic, RichEditorOptions.Underline, RichEditorOptions.AlignLeft, RichEditorOptions.AlignCenter, RichEditorOptions.AlignRight,
-                           RichEditorOptions.OrderedList, RichEditorOptions.UnorderedList, RichEditorOptions.Image]
+        toolbar.options = [RichEditorOptions.Undo, RichEditorOptions.Redo,  RichEditorOptions.Image]
         toolbar.setCustomTintColor(UIColor.greenColor())
         
         return toolbar
     }()
+    
+    lazy var popover: DYPopoverBar = {
+        
+        return DYPopoverBar(popoverOptions:[   .Type(.Up)], tintColor:UIColor.greenColor(), launchingToolbar:self.toolbar, showHandler: nil, dismissHandler: nil)
+    }()
+    
+    
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+
+
+     NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIKeyboardWillShowNotification, object: nil)
+        
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.keyboardDidShow(_:)), name: UIKeyboardDidShowNotification, object: nil)
         
         editorView.delegate = self
         editorView.inputAccessoryView = toolbar
@@ -32,23 +50,101 @@ class ViewController: UIViewController {
         toolbar.delegate = self
         toolbar.editor = editorView
 
-        // We will create a custom action that clears all the input text when it is pressed
-        let item = RichEditorOptionItem(image: nil, title: "Clear") { toolbar in
-            toolbar?.editor?.setHTML("")
-        }
+        //,
+        
+        let textDecoItem = RichEditorOptionItem(image: nil, title: "Deco") { (toolbar) in
+            
+                let point = CGPoint(x: self.popover.xCoords[0], y: self.popover.yCoord!)
+  
+               self.popover.options = [RichEditorOptions.Bold, RichEditorOptions.Italic, RichEditorOptions.Underline]
+                self.popover.show(point)
+            
 
-        var options = toolbar.options
-        options.append(item)
-        toolbar.options = options
+        }
+        
+
+        
+        let indent = RichEditorOptionItem(image: nil, title: "Indent") { (toolbar) in
+            let point = CGPoint(x: self.popover.xCoords[1], y: self.popover.yCoord!)
+
+            self.popover.options = [RichEditorOptions.AlignLeft, RichEditorOptions.AlignCenter, RichEditorOptions.AlignRight,RichEditorOptions.OrderedList, RichEditorOptions.UnorderedList]
+            self.popover.show(point)
+            
+        }
+     
+
+        toolbar.options.insert(indent, atIndex: 2)
+        
+        toolbar.options.append(textDecoItem)
+
+        let decoButton = self.toolbar.toolbar.items!.last
+        let decoView  = decoButton!.valueForKey("view") as? UIView
+        self.popover.xCoords.append(decoView!.center.x + 10.0)
+        
+        
+        let indentButton = self.toolbar.toolbar.items![2]
+        let indenView = indentButton.valueForKey("view") as? UIView
+        self.popover.xCoords.append(indenView!.center.x + 10.0)
+        
     }
+    
+    
+
+    
+//    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+//        super.touchesBegan(touches, withEvent: event)
+//        print("touches began called")
+////        if let touch = touches.first {
+////            
+////            self.touchPoint = touch.locationInView(self.view)
+////
+////        }
+//        
+//    }
+//    
+//    func handleTap(gesture:UITapGestureRecognizer) {
+//        print("handle tap called")
+//        self.touchPoint = gesture.locationInView(self.view)
+//    }
+    
+//    
+    func keyboardWillShow(notification:NSNotification) {
+        
+        let userInfo:NSDictionary = notification.userInfo!
+        let keyboardFrame:NSValue = userInfo.valueForKey(UIKeyboardFrameEndUserInfoKey) as! NSValue
+        let keyboardRectangle = keyboardFrame.CGRectValue()
+        let keyboardHeight = keyboardRectangle.height
+        
+        popover.yCoord  = self.view.frame.height - keyboardHeight
+   
+    }
+    
+    
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        self.popover.dismiss()
+    }
+    
+//    
+//    func keyboardDidShow(notification:NSNotification) {
+//        print("keyboad did show")
+//        let decoButton = self.toolbar.toolbar.items!.last
+//        self.launchItemView = decoButton!.valueForKey("view") as? UIView
+//        
+//    }
 
 }
+
+
+
 
 extension ViewController: RichEditorDelegate {
 
     func richEditor(editor: RichEditorView, heightDidChange height: Int) { }
 
     func richEditor(editor: RichEditorView, contentDidChange content: String) {
+      
+        self.popover.dismiss()
+        
         if content.isEmpty {
             htmlTextView.text = "HTML Preview"
         } else {
@@ -105,3 +201,5 @@ extension ViewController: RichEditorToolbarDelegate {
         }
     }
 }
+
+
